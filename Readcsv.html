@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Insert title here</title>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="OA.css">
+</head>
+<body>
+  <script type="text/javascript">
+  // 首先利用csv导入外部csv文件
+  d3.csv("Employer.csv",function(error,csvdata){
+    if(error){
+      console.log(error);
+    }
+    // 遍历每条员工信息，生成相应表格
+    for( var i=0; i<csvdata.length; i++ ){
+      var Name = csvdata[i].Name;
+      var Salary = csvdata[i].Salary;
+      var Grade = csvdata[i].Grade;
+      var Fund = csvdata[i].Fund
+
+      if(Salary==""||isNaN(Salary)){
+        alert("请输入数字!");
+      }
+      if(Fund==""||isNaN(Fund)){
+        alert("请输入数字!");
+      }
+      // 然后根据Grade的输入，更新Grade的值
+      switch (Grade)
+      {
+        case "A":
+        var Grade = 4000.0;break;
+        case "B":
+        var Grade = 2000;break;
+        case "C":
+        var Grade = 100;break;
+        case "D":
+        var Grade = 0;break;
+
+        default:
+        alert("请输入正确绩效评分!");
+      }
+      // 用res记录单位员工税前工资=岗位工资+绩效工资
+      //!!!虽然题目中写了“五险一金只按岗位工资计算”，但是比对实例结果发现是加过绩效工资的
+      // 所以此处也以加过绩效工资的值算五险一金
+      var res = Salary-(-Grade);
+      if(res >= 15108){
+        res = 15108;
+      }else if(res <=3022){
+        res = 3022;
+      }
+      // 下面值表示五险一金对应的单位缴纳值（2）及个人缴纳值（1）
+      var yl2 = res * 0.21;
+      var yl1 = res * 0.08;
+      var yll2 = res* 0.11;
+      var yll1 = res * 0.02;
+      var sy2 = res* 0.015;
+      var sy1 = res * 0.005;
+      var syy2 = res * 0.01;
+      var syy1 = 0;
+      var gs2 = res * 0.005;
+      var gs1 = 0;
+      var zf = res * Fund;
+      var sum1 = yl1+yll1+sy1+syy1+gs1+zf;
+      var sum2 = yl2+yll2+sy2+syy2+gs2+zf;
+
+      // 首先生成五险一金表格，利用d3，在原body中append table
+      var columns = [{head: 'TABLE', person: 'Personal', public: 'Public' }];
+      var data = [
+      { title: "养老", person: yl1, public: yl2},
+      { title: "医疗", person: yll1, public: yll2},
+      { title: "失业", person: sy1, public: sy2},
+      { title: "生育", person: syy1, public: syy2},
+      { title: "工伤", person: gs1, public: gs2},
+      { title: "住房", person: zf.toFixed(2), public: zf.toFixed(2)},
+      { title: "总计", person: sum1.toFixed(2), public: sum2.toFixed(2)},
+      /* ... */
+      ];
+      var table = d3.select('body').append('table');
+
+      // 首先append表头
+      var trd = table.append('thead').append('tr')
+      .selectAll('th')
+      .data(columns).enter()
+      .append('tr');
+
+      trd.append('th')
+      .attr('class', 'title')
+      .text('TABLE1');
+      trd.append('th')
+      .attr('class', 'center')
+      .text('Personal');
+      trd.append('th')
+      .attr('class', 'num')
+      .text('Public');
+
+      // 然后append具体表格内容
+      var tr = table.append('tbody').selectAll('tr')
+      .data(data).enter()
+      .append('tr');
+
+      tr.append('td')
+      .attr('class', 'title')
+      .html(function(m) { return m.title; });
+
+      tr.append('td')
+      .attr('class', 'center')
+      .html(function(m) { return m.person; });
+
+      tr.append('td')
+      .attr('class', 'num')
+      .html(function(m) { return m.public; });
+
+
+      // 扣税部分
+      // 重新计算res=为个人税前收-3500-五险一金（个人），用这个值来计算税ks
+      var res = Salary-(-Grade)-3500-sum1.toFixed(2);
+      var ks = 0;
+      if(res <= 1500){
+        ks = res*0.03;
+      }else{
+        if(res <= 4500)
+          ks = 45 - (-(res-1500)*0.1);
+        else{
+          if(res <= 9000)
+            ks = 345 - (-(res-4500)*0.2);
+          else{
+            if(res <= 35000)
+              ks = 1245 - (-(res-9000)*0.25);
+            else{
+              if(res <= 55000)
+                ks = 7745 - (-(res-35000)*0.3);
+              else{
+                if(res <= 80000)
+                  ks = 13745 - (-(res-55000)*0.35);
+                else{
+                  ks = 22495 - (-(res-80000)*0.45);
+                }
+              }
+            }
+          }
+        }
+      }
+      // 分别用sq和sh计算税前/税后的值
+      var sq = Salary-(-Grade)-sum1.toFixed(2);
+      var sh = (sq-ks);
+
+      // 再生成整体表格，利用d3，在原body中append table
+      var table = d3.select('body').append('table');
+
+      // 首先append表头
+      var trd = table.append('thead').append('tr')
+      .selectAll('th')
+      .data(columns).enter()
+      .append('tr');
+
+      trd.append('th')
+      .attr('class', 'title')
+      .text('姓名');
+
+      trd.append('th')
+      .attr('class', 'center')
+      .text('岗位工资 ');
+
+      trd.append('th')
+      .attr('class', 'center')
+      .text('绩效工资 ');
+
+      trd.append('th')
+      .attr('class', 'center')
+      .text('五险一金（个人） ');
+
+      trd.append('th')
+      .attr('class', 'center')
+      .text('五险一金（单位）');
+
+      trd.append('th')
+      .attr('class', 'center')
+      .text('税前收入');
+
+      trd.append('th')
+      .attr('class', 'num')
+      .text('扣税');
+      trd.append('th')
+      .attr('class', 'num')
+      .text('税后收入');
+
+      var data = [{Name: Name, GW: Salary, JX: Grade, WG: sum1.toFixed(2),WD: sum2.toFixed(2),SQ:sq.toFixed(2),KS:ks.toFixed(2),SH:sh.toFixed(2)}];
+
+      // 然后append具体表格内容
+      var tr = table.append('tbody').selectAll('tr')
+      .data(data).enter()
+      .append('tr');
+
+      tr.append('td')
+      .attr('class', 'center')
+      .html(function(m) { return m.Name; });
+
+      tr.append('td')
+      .attr('class', 'center')
+      .html(function(m) { return m.GW; });
+
+      tr.append('td')
+      .attr('class', 'center')
+      .html(function(m) { return m.JX; });
+
+      tr.append('td')
+      .attr('class', 'center')
+      .html(function(m) { return m.WG; });
+
+      tr.append('td')
+      .attr('class', 'center')
+      .html(function(m) { return m.WD; });
+
+      tr.append('td')
+      .attr('class', 'num')
+      .html(function(m) { return m.SQ; });
+
+      tr.append('td')
+      .attr('class', 'num')
+      .html(function(m) { return m.KS; });
+
+      tr.append('td')
+      .attr('class', 'num')
+      .html(function(m) { return m.SH; });
+    }
+  });
+
+
+</script>
+</body>
+</html>

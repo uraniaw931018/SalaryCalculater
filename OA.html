@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Insert title here</title>
+  <script type="text/javascript" src="OA.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="OA.css">
+
+</head>
+<body>
+  <h1 align="center">上海市某单位员工收入计算器</h1>
+  <div>
+
+    <div align="center">
+      <span>姓名：<input type="text" id="name" />       </span>
+      <span>住房公积金缴纳比例：<input type="text" id="zfb" />       </span>
+      <span>岗位工资:<input type="text" id="sal1" />      </span>
+      <span>绩效评分:<input type="text" id="sal2">
+        <input type="button" value="计算" onclick="total()" />      </span>
+      </div>
+      <br/><br/>
+      <div align="center">
+        <span>五险一金详情:      </span>
+        <br/>
+        <table>
+          <tr>
+            <td colspan="4"></td>
+            <td id="name1"></td>
+            <td colspan="4">单位</td>
+          </tr>
+          <tr>
+            <td colspan="4">养老</td>
+            <td id="yl1"></td>
+            <td id="yl2"></td>
+          </tr>
+          <tr>
+            <td colspan="4">医疗</td>
+            <td id="yll1"></td>
+            <td id="yll2"></td>
+          </tr>
+          <tr>
+            <td colspan="4">失业</td>
+            <td id="sy1"></td>
+            <td id="sy2"></td>
+          </tr>
+          <tr>
+            <td colspan="4">生育</td>
+            <td id="syy1"></td>
+            <td id="syy2"></td>
+          </tr>
+          <tr>
+            <td colspan="4">工伤</td>
+            <td id="gs1"></td>
+            <td id="gs2"></td>
+          </tr>
+          <tr>
+            <td colspan="4">住房</td>
+            <td id="zf"></td>
+            <td id="zf2"></td>
+          </tr>
+          <tr>
+            <td colspan="4">总计</td>
+            <td id="sum1"></td>
+            <td id="sum2"></td>
+          </tr>
+        </table>
+        <br/><br/>
+        收入详情：<br/>
+        <table>
+          <tr>
+            <td colspan="4">姓名</td>
+            <td colspan="4">岗位工资</td>
+            <td colspan="4">绩效工资</td>
+            <td colspan="4">五险一金（个人）</td>
+            <td colspan="4">五险一金（单位）</td>
+            <td colspan="4">税前收入</td>
+            <td colspan="4">扣税</td>
+            <td colspan="4">税后收入</td>
+          </tr>
+          <tr>
+            <td colspan="4" id = "name2"></td>
+            <td colspan="4" id="gw"></td>
+            <td colspan="4" id="jx"></td>
+            <td colspan="4" id="wg"></td>
+            <td colspan="4" id="wd"></td>
+            <td colspan="4" id="sq"></td>
+            <td colspan="4" id="ks"></td>
+            <td colspan="4" id="sh"></td>
+          </tr>
+        </table>
+        
+      </div>
+      <input type="button" value="导入外部文件" onclick="location.href = 'Readcsv.html';" />
+    </div>
+  </body>
+  </html>
